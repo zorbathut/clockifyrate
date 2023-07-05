@@ -134,8 +134,7 @@ days_ahead = hours_ahead / (HOURS_THIS_MONTH / days_in_month)
 
 # this should be a compact flag but right now it isn't
 if True:
-    #print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {hours_per_month_pessimistic / HOURS_THIS_MONTH * 100:.0f}% - {days_needed:+.2f}</center>")
-    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {hours_per_month_pessimistic / HOURS_THIS_MONTH * 100:.0f}% - {hours - hours_planned:+.2f}</center>")
+    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {days_ahead:+.2f}</center>")
 else:
     print(f"Current hours so far this month: {hours:2f} hours")
     print(f"Current hours per month rate: {rate:.2f} hours")
