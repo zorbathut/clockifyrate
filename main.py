@@ -38,8 +38,6 @@ def get_total_worked_hours(api_key, workspace_id, user_id):
 
     total_hours = 0
 
-    pprint.pprint(time_entries)
-
     for entry in time_entries:
         start_time = datetime.fromisoformat(entry["timeInterval"]["start"].rstrip("Z")).replace(tzinfo=timezone.utc)
 
@@ -47,8 +45,6 @@ def get_total_worked_hours(api_key, workspace_id, user_id):
             end_time = datetime.fromisoformat(entry["timeInterval"]["end"].rstrip("Z")).replace(tzinfo=timezone.utc)
         else:
             end_time = datetime.now(timezone.utc)
-
-        print(start_time, end_time)
 
         # Calculate the duration of the time entry
         duration = end_time - start_time
@@ -112,9 +108,36 @@ with open("config.json") as file:
 USER_ID = get_user_id(API_KEY)
 WORKSPACE_ID = get_workspace_id(API_KEY)
 
-# Calculate the hours per month rate
-rate, hours = calculate_hours_per_month(API_KEY, WORKSPACE_ID, USER_ID)
+# Total worked hours
+hours = get_total_worked_hours(API_KEY, WORKSPACE_ID, USER_ID)
 
-print(f"Current hours so far this month: {hours:2f} hours")
-print(f"Current hours per month rate: {rate:.2f} hours")
-print(f"Current speed in percent: {rate / HOURS_THIS_MONTH * 100:2f}%")
+# Get the number of days passed in the current month
+today = date.today()
+days_passed = today.day
+
+# Days in a month
+now = datetime.now()
+_, days_in_month = calendar.monthrange(now.year, now.month)
+
+# Calculate the pessimistic hours per month rate
+rate = hours / days_passed * days_in_month
+
+# Calculate the pessimistic hours per month rate
+hours_per_month_pessimistic = hours / min(days_passed + 2, days_in_month) * days_in_month
+
+# Calculate where we should be in the month-plus-two
+hours_planned = HOURS_THIS_MONTH / days_in_month * min(days_passed + 2, days_in_month)
+
+hours_ahead = hours - hours_planned
+
+days_ahead = hours_ahead / (HOURS_THIS_MONTH / days_in_month)
+
+# this should be a compact flag but right now it isn't
+if True:
+    #print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {hours_per_month_pessimistic / HOURS_THIS_MONTH * 100:.0f}% - {days_needed:+.2f}</center>")
+    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {hours_per_month_pessimistic / HOURS_THIS_MONTH * 100:.0f}% - {hours - hours_planned:+.2f}</center>")
+else:
+    print(f"Current hours so far this month: {hours:2f} hours")
+    print(f"Current hours per month rate: {rate:.2f} hours")
+    print(f"Current hours per month rate pessimistic: {hours_per_month_pessimistic:.2f} hours")
+    print(f"Current pessimistic speed in percent: {hours_per_month_pessimistic / HOURS_THIS_MONTH * 100:2f}%")
