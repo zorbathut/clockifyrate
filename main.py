@@ -111,32 +111,32 @@ WORKSPACE_ID = get_workspace_id(API_KEY)
 # Total worked hours
 hours = get_total_worked_hours(API_KEY, WORKSPACE_ID, USER_ID)
 
-# Get the number of days passed in the current month
-today = date.today()
-days_passed = today.day
+# Get the number of total days, including fractions, passed in the current month
+today = datetime.now()
+days_passed = today.day + today.hour / 24 + today.minute / 1440
 
 # Days in a month
 now = datetime.now()
 _, days_in_month = calendar.monthrange(now.year, now.month)
 
-# Calculate the pessimistic hours per month rate
-rate = hours / days_passed * days_in_month
+# Calculate how many hours per day we need
+hours_per_day = HOURS_THIS_MONTH / days_in_month
 
-# Calculate the pessimistic hours per month rate
-hours_per_month_pessimistic = hours / min(days_passed + 2, days_in_month) * days_in_month
+# Calculate how many days of work we've done
+days_worked = hours / hours_per_day
 
-# Calculate where we should be in the month-plus-two
-hours_planned = HOURS_THIS_MONTH / days_in_month * min(days_passed + 2, days_in_month)
+# Calculate how many days ahead or behind we are
+days_ahead = days_worked - days_passed
 
-hours_ahead = hours - hours_planned
-
-days_ahead = hours_ahead / (HOURS_THIS_MONTH / days_in_month)
+# . . . pessimistically
+days_ahead_pessimistic = days_ahead - 2
 
 # this should be a compact flag but right now it isn't
 if True:
-    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {days_ahead:+.2f}</center>")
+    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {days_ahead_pessimistic:+.2f}</center>")
 else:
     print(f"Current hours so far this month: {hours:2f} hours")
-    print(f"Current hours per month rate: {rate:.2f} hours")
-    print(f"Current hours per month rate pessimistic: {hours_per_month_pessimistic:.2f} hours")
-    print(f"Current pessimistic speed in percent: {hours_per_month_pessimistic / HOURS_THIS_MONTH * 100:2f}%")
+    print(f"Days passed in the current month: {days_passed:.2f} days")
+    print(f"Days worked so far this month: {days_worked:.2f} days")
+    print(f"Days ahead: {days_ahead:.2f} days")
+    print(f"Days ahead pessimistic: {days_ahead_pessimistic:.2f} days")
