@@ -128,15 +128,17 @@ days_worked = hours / hours_per_day
 # Calculate how many days ahead or behind we are
 days_ahead = days_worked - days_passed
 
-# . . . pessimistically
-days_ahead_pessimistic = days_ahead - 2
+# Calculate how many hours of work per day we still need to hit our target
+hours_per_day_left = (HOURS_THIS_MONTH - hours) / (days_in_month - days_passed)
+warning = hours_per_day_left >= 8 and " !!!" or ""
 
 # this should be a compact flag but right now it isn't
 if True:
-    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {days_ahead_pessimistic:+.2f}</center>")
+    print(f"<center>{hours:.1f} / {HOURS_THIS_MONTH:.1f} - {days_ahead:+.2f}{warning}</center>")
 else:
     print(f"Current hours so far this month: {hours:2f} hours")
     print(f"Days passed in the current month: {days_passed:.2f} days")
     print(f"Days worked so far this month: {days_worked:.2f} days")
     print(f"Days ahead: {days_ahead:.2f} days")
-    print(f"Days ahead pessimistic: {days_ahead_pessimistic:.2f} days")
+    print(f"Hours per day left: {hours_per_day_left:.2f} hours")
+
